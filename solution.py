@@ -12,9 +12,12 @@ boxes = cross(rows, cols)
 row_units = [cross(r, cols) for r in rows]
 column_units = [cross(rows, c) for c in cols]
 square_units = [cross(rs, cs) for rs in ('ABC', 'DEF', 'GHI') for cs in ('123', '456', '789')]
-diagonal1 = [[r + c] for r, c in zip(rows,cols)]
-diagonal2 = [[r + c] for r, c in zip(rows, cols[::-1])]
-unitlist = row_units + column_units + square_units + diagonal1 + diagonal2
+
+diagonal1 = [r+c for r,c in zip(rows, cols)]
+diagonal2 = [r+c for r,c in zip(rows, cols[::-1])]
+diags = [diagonal1 + diagonal2]
+
+unitlist = row_units + column_units + square_units + diags
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
 peers = dict((s, set(sum(units[s],[])) - set([s])) for s in boxes)
 
@@ -42,12 +45,29 @@ def naked_twins(values):
     Returns:
         the values dictionary with the naked twins eliminated from peers.
     """
-    print(display(values))
-    print('=================')
     # Find all instances of naked twins
     # Eliminate the naked twins as possibilities for their peers
     
+    possible_nt = [box for box in values.keys() if len(values[box]) == 2]
+    print('possibles', possible_nt)
 
+    nakedTwins = []
+    for box in possible_nt:
+        for p in peers[box]:
+            if values[p] == values[box]:
+                nakedTwins.append([p, box])
+    print('naked twins', nakedTwins)
+
+    for b1, b2 in nakedTwins:
+        d1 = values[b1][0]
+        d2 = values[b1][1]
+        commons = (list(peers[b1] & peers[b2]))
+
+        for p in commons:
+            if len(values[p]) > 1 and p != b1 and p != b2:
+                values[p] = values[p].replace(d1, '')
+                values[p] = values[p].replace(d2, '')
+    print(values)
     return values
 
 def grid_values(grid):
@@ -60,7 +80,7 @@ def grid_values(grid):
             Keys: The boxes, e.g., 'A1'
             Values: The value in each box, e.g., '8'. If the box has no value, then the value will be '123456789'.
     """
-    assert len(grid) == 81
+    grid = ['123456789' if i=='.' else i for i in list(grid)]
     return dict(zip(boxes, grid))
 
 def display(values):
@@ -69,6 +89,7 @@ def display(values):
     Args:
         values(dict): The sudoku in dictionary form
     """
+    print(values)
     width = 1+max(len(values[s]) for s in boxes)
     line = '+'.join(['-'*(width * 3)] * 3)
     for r in rows:
@@ -129,10 +150,7 @@ def solve(grid):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
-    if type(grid) is str:
-        values = grid_values(grid)
-    else:
-        values = grid
+    values = grid_values(grid)
     return search(values)
 
 if __name__ == '__main__':
