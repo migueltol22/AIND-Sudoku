@@ -3,11 +3,15 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: *Student should provide answer here*
+A: The constraint given to us in the naked twins problem is:
+	1. a unit must have 2 possible values
+	2. if there is another unit among its peers that have the same possibilites then it is a naked twin
+	3. if there is a pair of naked twins then those possibilites must be removed as possible values for all other peers
+	Using these constraints we can build our function to satisfy these constraints. In the order listed above we could start building our naked_twins function. First thing I did was grab all the units that have only 2 possible values (length of 2). From there we can move on to the next constraint, which would be to grab all the units that have a naked twin pair by checking if the possible values are the same among their peers. Lastly, we would remove these possibilities as possibilites for the rest of the units in thir respective peers. Handling the contraints lead us to our solution. 
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: *Student should provide answer here*
+A: For the diagonal sudoku problem we are adding one more constraint to our program. We already have existing constraints from sudoku itself that are very similar to diagonal sudoku. Unitlist is already accomplishing the constraints from sudoku and in order to satisfy the diagonal sudoku problem we can add the values that are needed to be satisfied to unitlist. Doing this will cause our problem to attempt to satisfy this constraint as well.
 
 ### Install
 
