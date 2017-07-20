@@ -49,30 +49,24 @@ def naked_twins(values):
     
     #Grabbing all values with length of two
     possibles = [box for box in values.keys() if len(values[box]) == 2]
-    # print('possibles', possibles)
 
-    # Taking all the possible naked twins and checking if they are naked twins or not
-    # If there is a match in its peers then it is a naked twins and gets added to nakedTwins
-    nakedTwins = []
-    for box in possibles:
-        for p in peers[box]:
-            if values[p] == values[box]:
-                nakedTwins.append([p, box])
-    print('naked twins', nakedTwins)
+   # assigning all sets of naked twins by comparing it with its peers and if they are equal then append pairs to nakedTwins
+    nakedTwins = [[b1, b2] for b1 in possibles for b2 in peers[b1] if values[b1] == values[b2]]
 
-    # First creating a common list of the peers of the nakedTwins
-    # Grabbing each digit for the naked twin and going through all the peers of 
-    # the naked twins and removing the digits if they exist while checking not to remove
-    # the values of the naked twins themselves
+   # going through each pair in nakedTwins
     for b1, b2 in nakedTwins:
-        d1 = values[b1][0]
-        d2 = values[b1][1]
-        commons = (list(peers[b1] & peers[b2]))
-        print('commson', commons)
-        for p in commons:
-            if len(values[p]) > 1 and p != b1 and p != b2:
-                values[p] = values[p].replace(d1, '')
-                values[p] = values[p].replace(d2, '')
+        #checking to make sure the length of each pair is two
+        if len(values[b1]) == 2 and len(values[b2]) == 2:
+            d1 = values[b1][0]
+            d2 = values[b1][1]
+            # grabbing all common peers for the twins
+            commons = list(set(peers[b1]) & set(peers[b2]))
+            for p in commons:
+                # removing the values of the naked twins from all other peers
+                # while making sure it does not remove it from the twin itself
+                if len(values[p]) > 1 and values[p] != values[b1] and values[p] != values[b2]:
+                    values[p] = values[p].replace(d1, '')
+                    values[p] = values[p].replace(d2, '')
     
 
     #returning values
@@ -128,6 +122,7 @@ def reduce_puzzle(values):
         solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
         values = eliminate(values)
         values = only_choice(values)
+        values = naked_twins(values)
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
         stalled = solved_values_before == solved_values_after
         if len([box for box in values.keys() if len(values[box]) == 0]):
